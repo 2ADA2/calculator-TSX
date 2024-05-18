@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import {CalcButton} from "./components/calcButton";
-import {simbols} from "./utils/values";
+import {simbols, simbolsString} from "./utils/values";
 import {convertField} from "./functions/convertField";
 
 const calcs = simbols.slice().filter(e => typeof e === "string")
@@ -11,6 +11,7 @@ function App() {
     const [value, setValue] = useState<string>("");
 
     useEffect(() => {
+        console.log(value)
         if (!value || value.length === 1) return
         const first = value.split("")[0]
 
@@ -42,7 +43,23 @@ function App() {
         const endVal:string[] = Array.from(String(value + val))
         endVal.splice((value + val).length - newVal.length, 100, convertField(newVal))
         setValue(endVal.join(""))
+    }
 
+    function handleChange(e : React.KeyboardEvent<HTMLInputElement>) {
+        if(e.key === "Enter") {
+            calcField();
+            return;
+        }
+        if(e.key === "Backspace"){
+            setValue(value.slice(0,value.length-1))
+            return;
+        }
+        if(!simbolsString.includes(e.key) && e.key !== ".") {
+            console.log(e.key)
+            return
+        }
+
+        addToCalc(e.key)
     }
 
     return (
@@ -52,7 +69,11 @@ function App() {
                 <div className={"calculator-panel"}>
                     <div className={"calculator-input"}>
                         <div className={"calculator-history"}></div>
-                        <input className={"calculator-input"} type={"text"} value={value}></input>
+                        <input
+                            className={"calculator-input"}
+                            type={"text"}
+                            value={value}
+                            onKeyDown = {(e) => handleChange(e)}></input>
                         <div className={"calculator-result"}></div>
                     </div>
                     <section className={"calculator-buttons"}>
